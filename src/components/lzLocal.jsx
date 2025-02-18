@@ -32,7 +32,7 @@ const LZoomLocal = () => {
     console.log("Data sources added:", {dataSources});
 
     // Layout for the LocusZoom plot
-    const layout = {
+    const layout1 = {
       width: 800,
       height: 600,
       panels: [
@@ -66,6 +66,8 @@ const LZoomLocal = () => {
       ]
     };
 
+    console.log({variantForPlot, variantGroups, variantChrom, variantPosition})
+
     var mods = {
         state: {
             variant: variantForPlot,
@@ -74,7 +76,7 @@ const LZoomLocal = () => {
         chr: variantChrom
         }
     }
-
+    var layout2 = LocusZoom.Layouts.get("plot", "standard_phewas", mods);
 
     // Initialize the LocusZoom plot
     // LocusZoom.populate("#lz-plot", dataSources, layout);
