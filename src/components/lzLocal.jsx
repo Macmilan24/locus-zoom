@@ -5,17 +5,25 @@ import 'locuszoom/dist/locuszoom.css';
 const LZoomLocal = () => {
   useEffect(() => {
     // Data sources for LocusZoom
+    const apiBase = 'https://portaldev.sph.umich.edu/api/v1/';
     const dataSources = new LocusZoom.DataSources()
     .add('assoc', ['AssociationLZ', { 
+        build: 'GRCh38',
         url: '/Data/df_locus_zoom.csv',
         delimiter: '\t',
         fields: { snp: 'SNPID', chrom: 'CHR', position: 'BP', pvalue: 'P' }
       }])  // Association Data with headers
-      .add('LD', ['LDServer', { url: '/Data/sig_locus_mt(1).ld' }]);  // LD Matrix Data
+      .add("gene", ["GeneLZ", { 
+        url: apiBase + "annotation/genes/", 
+        build: 'GRCh38' 
+      }])
+      .add('LD', ['LDServer', { url: '/Data/sig_locus_mt(1).ld', 
+        build: 'GRCh38' 
+      }]);  // LD Matrix Data
+
 
     // Define the region of interest
     const variantForPlot = "16:53668214:T:G";
-    // const VARIANT_PATTERN = /(\d+):(\d+)_([ATGC])\/([ATGC])/;
     const VARIANT_PATTERN = /(\d+):(\d+):([ATGC]+):([ATGC]+)/;
 
     const variantGroups = VARIANT_PATTERN.exec(variantForPlot);
@@ -69,8 +77,13 @@ const LZoomLocal = () => {
 
 
     // Initialize the LocusZoom plot
-    LocusZoom.populate("#lz-plot", dataSources, mods);
-    console.log({kk:LocusZoom.populate("#lz-plot", dataSources, mods)})
+    // LocusZoom.populate("#lz-plot", dataSources, layout);
+    try {
+      LocusZoom.populate("#lz-plot", dataSources, layout);
+    } catch (error) {
+      console.error("LocusZoom initialization error:", error);
+    }
+    console.log({kk:LocusZoom.populate("#lz-plot", dataSources, layout)})
   }, []); // Run once on component mount
 
   return (
@@ -82,78 +95,3 @@ const LZoomLocal = () => {
 };
 
 export default LZoomLocal;
-
-// import React, { useEffect, useRef } from 'react';
-// import LocusZoom from 'locuszoom';
-
-// const LZoomLocal = () => {
-//     const plotRef = useRef(null);
-
-//     useEffect(() => {
-//         const dataSources = new LocusZoom.DataSources()
-//             .add('assoc', ['AssociationLZ', { url: '/Data/df_locus_zoom.csv' }])  // Association Data
-//             .add('LD', ['LDServer', { url: '/Data/sig_locus_mt_r2(1).ld' }]);  // LD Data (R² values)
-        
-//         var variantForPlot = "10:114758349_C/T";
-//         // Throughout this demo, we will match variants of the format 10:100_C/T
-//         var VARIANT_PATTERN = /(\d+):(\d+)_([ATGC])\/([ATGC])/;
-    
-//         // Break the variant into constituent parts for setting plot state
-//         var variantGroups = VARIANT_PATTERN.exec(variantForPlot);
-//         var variantChrom = variantGroups[1];
-//         var variantPosition = +variantGroups[2];
-    
-//         var mods = {
-//             state: {
-//                 variant: variantForPlot,
-//                 start: variantPosition - 250000,
-//                 end: variantPosition + 250000,
-//             chr: variantChrom
-//             }
-//         }
-//         console.log(LocusZoom.Layouts.list("plot"))
-//         // var layout = LocusZoom.Layouts.get("plot", "standard_association", mods);
-        
-//         const layout = {
-//             width: 800,
-//             height: 600,
-//             panels: [
-//                 {
-//                     id: 'association',
-//                     data_layers: [
-//                         {
-//                             id: 'assoc_points',
-//                             type: 'scatter',
-//                             data: 'assoc',
-//                             fields: ['assoc:POS', 'assoc:P'],
-//                         },
-//                     ],
-//                 },
-//                 {
-//                     id: 'ld_panel',
-//                     data_layers: [
-//                         {
-//                             id: 'ld',
-//                             type: 'ld',
-//                             data: 'ld',
-//                             fields: ['ld:SNP_A', 'ld:SNP_B', 'ld:R2'],
-//                         },
-//                     ],
-//                 },
-//             ],
-//         };
-
-//         LocusZoom.populate("#lz-plot", dataSources, layout);
-//     }, []);
-
-//     return (
-//         <div>
-//             <h1 style={{ textAlign: 'center' }}>LocusZoomLocal Visualization</h1>
-//             <div style={{ width: '100%', height: '600px' }}></div>
-//             <div id="lz-plot"></div>
-
-//         </div>
-//     );
-// }
-
-// export default LZoomLocal;
