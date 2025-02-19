@@ -65,19 +65,20 @@ const LZoomLocal = () => {
         }
       ]
     };
-
+    
     console.log({variantForPlot, variantGroups, variantChrom, variantPosition})
-
+    
     var mods = {
-        state: {
-            variant: variantForPlot,
-            start: variantPosition - 2,
-            end: variantPosition + 2,
+      state: {
+        variant: variantForPlot,
+        start: variantPosition - 2,
+        end: variantPosition + 2,
         chr: variantChrom
-        }
+      }
     }
-    var layout2 = LocusZoom.Layouts.get("plot", "standard_phewas", mods);
-
+    var layout2 = LocusZoom.Layouts.get("plot", "ld", mods);
+    
+    console.log(LocusZoom.Layouts.list());
     // Initialize the LocusZoom plot
     // LocusZoom.populate("#lz-plot", dataSources, layout);
     try {
