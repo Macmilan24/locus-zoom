@@ -10,8 +10,8 @@ function App() {
 
   return (
     <>
-      {/* <LZoom /> */}
-      <LZoomLocal />
+      <LZoom />
+      {/* <LZoomLocal /> */}
     </>
   )
 }
