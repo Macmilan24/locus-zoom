@@ -21,11 +21,10 @@ const LZoom = () => {
       url: "http://exac.broadinstitute.org/api/constraint",
       build: 'GRCh37'
     }])
-    .add("recomb", ["RecombLZ", { url: "http://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/", params: {source: 15} } ])
+    .add("recomb", ["RecombLZ", { url: "http://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/", source: 15 } ])
     .add("sig", ["StaticJSON", { data: [{ "x": 0, "y": 7.30103 }, { "x": 2881033286, "y": 7.30103 }] }])
     .add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/" }])
-    .add("study_41", ["AssociationLZ", { url: "http://portaldev.sph.umich.edu/api/v1/single/", params:{ source: 41 } 
-    }]
+    .add("study_41", ["AssociationLZ", { url: "http://portaldev.sph.umich.edu/api/v1/single/", source: 41  }]
 )
 
     // Layout - the description of the plot and how data is presented. We start with only the genes panel.
@@ -44,14 +43,15 @@ const LZoom = () => {
       start: 200000,
       end: 300000,
     },
-  responsive_resize: true,
-  min_region_scale: 100000,
-  // max_region_scale: 10000,
-  aspect_ratio: 4,
-  dashboard: LocusZoom.Layouts.get("toolbar", "region_nav_plot"),
-  panels: [
-    LocusZoom.Layouts.get("panel","genes"),
-    LocusZoom.Layouts.get("panel", "association", mods)
+    responsive_resize: true,
+    min_region_scale: 100000,
+    // max_region_scale: 10000,
+    aspect_ratio: 4,
+    dashboard: LocusZoom.Layouts.get("toolbar", "region_nav_plot"),
+    panels: [
+      LocusZoom.Layouts.get("panel","genes"),
+      LocusZoom.Layouts.get("panel", "association", mods),
+      // LocusZoom.Layouts.get("panel", "ld"),
   ]};
 
   console.log({il:initial_layout.panels[1]})
