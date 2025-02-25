@@ -1,5 +1,4 @@
-{
-    "data": [
+[
         {
             "chrom": "16",
             "end": 204502,
@@ -4345,18 +4344,4 @@
                 }
             ]
         }
-    ],
-    "lastPage": null,
-    "meta": {
-        "datasets": [
-            {
-                "genome_build": "GRCh37",
-                "id": 5,
-                "organism": "human",
-                "source": "gencode",
-                "taxid": 9606,
-                "version": "35"
-            }
-        ]
-    }
-}
+]
