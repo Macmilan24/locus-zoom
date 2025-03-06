@@ -22,9 +22,9 @@ const LZoom = () => {
       var data_sources = new LocusZoom.DataSources()
         .add("sig", ["StaticJSON", { data: [{ "x": 0, "y": 7.30103 }, { "x": 2881033286, "y": 7.30103 }] }])
         .add("gene", ["GeneLZ", {
-          url: "http://127.0.0.1:8000/genes",
+          // url: "http://127.0.0.1:8000/genes",
           // url: "http://localhost:3000/gene/", 
-          // url: "http://portaldev.sph.umich.edu/api/v1/annotation/genes/", 
+          url: "http://portaldev.sph.umich.edu/api/v1/annotation/genes/", 
           build: 'GRCh37'
         }])
         .add("constraint", ["GeneConstraintLZ", {
@@ -32,18 +32,18 @@ const LZoom = () => {
           build: 'GRCh37'
         }])
         .add("recomb", ["RecombLZ", {
-          url: "http://127.0.0.1:8000/recomb/", 
-          // url: "http://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/",
+          // url: "http://127.0.0.1:8000/recomb/", 
+          url: "http://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/",
           params: { source: 15 }
         }])
         .add("ld", ["LDServer", {
-          url: "http://127.0.0.1:8000/ld/",
-          // url: "https://portaldev.sph.umich.edu/ld/" ,
+          // url: "http://127.0.0.1:8000/ld/",
+          url: "https://portaldev.sph.umich.edu/ld/" ,
           variant: "16:53668214:T:G",
         }])
         .add("study_41", ["AssociationLZ", {
-          url: "http://127.0.0.1:8000/single/", 
-          // url: "http://portaldev.sph.umich.edu/api/v1/single/",
+          // url: "http://127.0.0.1:8000/single/", 
+          url: "http://portaldev.sph.umich.edu/api/v1/single/",
           params: { source: 41 }
         }])
 

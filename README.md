@@ -1,10 +1,3 @@
-Alright, let's create a comprehensive guide based on our conversation, focusing on LocusZoom for developers, and keeping your specific questions and our previous discussions in mind.
-
-**LocusZoom for Developers: A Practical Guide**
-
-**Introduction**
-
-LocusZoom is a powerful JavaScript library for visualizing genetic data, particularly association studies. As a developer, you can leverage LocusZoom to create interactive and informative visualizations for your web applications. This guide will walk you through the key concepts, focusing on the `mods` object, panels, and data dependencies.
 
 **Key Concepts**
 
@@ -17,7 +10,7 @@ LocusZoom is a powerful JavaScript library for visualizing genetic data, particu
 **Data Dependencies: A Crucial Relationship**
 
 * **Implicit Dependencies:** LocusZoom panels, especially the `association` panel, can have implicit data dependencies. This means that even if you don't explicitly configure a panel to use a specific data source (like LD), it might still try to use it if it's available.
-* **Example:** If you add an `LDServer` data source, the `association` panel might automatically use the LD data to color points or add tooltips. If you remove the `LDServer` data source, the `association` panel might fail to render correctly. Same with recomb data, if using association then you need to specify recomb data too for some reason 
+* **Example:** If you add an `LDServer` data source, the `association` panel might automatically use the LD data to color points or add tooltips. If you remove the `LDServer` data source, the `association` panel might fail to render correctly. Similarly, if using association data, you need to specify recombination data too.
 * **Data Source as Foundation:** Data sources define what data is available to all panels. If a panel needs a particular type of data, it must be present in the data sources.
 
 **Panels: Visualizing Genetic Data**
@@ -84,9 +77,9 @@ const layout = {
 };
 ```
 
-**This is mod**
+<!-- **This is mod**
 ```
-{
+const mod = {
       id: 'myAssociationPanel',
       title: { text: 'Custom Association Plot' },
       namespace: { default: 'association', ld: 'ld' },
@@ -95,7 +88,7 @@ const layout = {
     LocusZoom.Layouts.get("panel", "association", mods)
     }
 
-```
+``` -->
 
 **Key `mods` Parameters:**
 
@@ -182,14 +175,3 @@ const layout = {
 * **Namespace Conflicts:** Use namespaces to prevent data field name collisions.
 * **LD Dependencies:** Be aware of implicit LD dependencies in the `association` panel.
 
-**Conclusion**
-
-LocusZoom is a powerful tool for visualizing genetic data. By understanding the key concepts, you can create interactive and informative visualizations for your web applications.
-
-**Remember:**
-
-* Always refer to the LocusZoom documentation for the most up-to-date information.
-* Experiment with different configurations to see how they affect the plot.
-* Don't be afraid to ask for help from the LocusZoom community.
-
-This guide should give you a solid foundation for working with LocusZoom as a developer. Feel free to ask if you have more questions.
