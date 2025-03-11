@@ -17,34 +17,34 @@ const LZoom = () => {
         { gene_name: "Y_RNA", gene_id: "ENSG00000207243.1", chrom: "16", start: 228553, end: 228655 },
         // More gene objects...
       ];
-
+      const baseUrl = "http://100.67.47.42:5011/json/"
       // Data Sources - APIs LocusZoom will connect to for various pieces of data
       var data_sources = new LocusZoom.DataSources()
         .add("sig", ["StaticJSON", { data: [{ "x": 0, "y": 7.30103 }, { "x": 2881033286, "y": 7.30103 }] }])
         .add("gene", ["GeneLZ", {
-          // url: "http://127.0.0.1:8000/genes",
+          // url: `${baseUrl}/genes`,
           // url: "http://localhost:3000/gene/", 
           url: "http://portaldev.sph.umich.edu/api/v1/annotation/genes/", 
-          build: 'GRCh37'
+          build: 'GRCh38'
         }])
         .add("constraint", ["GeneConstraintLZ", {
           url: "http://exac.broadinstitute.org/api/constraint",
-          build: 'GRCh37'
+          build: 'GRCh38'
         }])
         .add("recomb", ["RecombLZ", {
-          // url: "http://127.0.0.1:8000/recomb/", 
+          // url: `${baseUrl}/recomb/`,
           url: "http://portaldev.sph.umich.edu/api/v1/annotation/recomb/results/",
           params: { source: 15 }
         }])
         .add("ld", ["LDServer", {
-          // url: "http://127.0.0.1:8000/ld/",
+          // url: `${baseUrl}/ld`,
           url: "https://portaldev.sph.umich.edu/ld/" ,
-          variant: "16:53668214:T:G",
+          // variant: "16:53668214:T:G",
         }])
         .add("study_41", ["AssociationLZ", {
-          // url: "http://127.0.0.1:8000/single/", 
-          url: "http://portaldev.sph.umich.edu/api/v1/single/",
-          params: { source: 41 }
+          url: `${baseUrl}`,
+          // url: "http://portaldev.sph.umich.edu/api/v1/single/",
+          // params: { source: 41 }
         }])
 
       // Layout - the description of the plot and how data is presented. We start with only the genes panel.
@@ -63,11 +63,11 @@ const LZoom = () => {
         state: {
           chr: 16,
           // variant: variantForPlot,
-          start: 200000,
-          end: 800000,
+          start: 53673256,
+          end: 53789999,
         },
         responsive_resize: true,
-        min_region_scale: 1000,
+        // min_region_scale: 1000,
         // max_region_scale: 10000,
         aspect_ratio: 4,
         dashboard: LocusZoom.Layouts.get("toolbar", "region_nav_plot"),
