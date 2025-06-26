@@ -1,3 +1,11 @@
 svg.lz-locuszoom .lz-axis {
     color: black
 }
+
+div.lz-data_layer-tooltip {
+    color: black
+}
+
+div.lz-toolbar-menu .lz-toolbar-menu-content {
+    color: black
+}
