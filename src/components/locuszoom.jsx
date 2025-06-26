@@ -7,7 +7,7 @@ import LzDynamicUrls from 'locuszoom/esm/ext/lz-dynamic-urls';
 import credibleSets from '../utils/custom-cs-adapter'
 import ldAdapter from '../utils/custom-ld-adapter'
 
-const LZoom = ({ start = 1, end = 53831146, variant="16:53817318:G:A", chr = 16}) => {
+const LZoom = ({ start = 53673256, end = 53831146, variant="16:53817318:G:A", chr = 16}) => {
 
   const plotRef = useRef(null);
   const inputRef = useRef(null);
@@ -48,6 +48,7 @@ const LZoom = ({ start = 1, end = 53831146, variant="16:53817318:G:A", chr = 16}
         }])
         .add(namespace, ["AssociationLZ", {
           url: `${baseUrl}`,
+          params:{ source: 41 } 
         }])
         .add("credset", ["Custom-CredibleSetLZ"])
 
@@ -77,7 +78,7 @@ const LZoom = ({ start = 1, end = 53831146, variant="16:53817318:G:A", chr = 16}
           start,
           end,
           ld_pop: "EUR",
-          genome_build: "GRCh38",
+          genome_build: "GRCh37",
           ldrefvar: variant
         },
         responsive_resize: true,
