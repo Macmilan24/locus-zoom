@@ -7,9 +7,11 @@ import './App.css'
 import LZoom from './components/locuszoom'
 
 const App = () => {
-  const [start, setStart] = useState(53673256);
-  const [end, setEnd] = useState(53831146);
-  const [variant, setVariant] = useState(""); // Adjust this if you want to use the variant prop
+  // const [start, setStart] = useState(200073);
+  const [chr, setChr] = useState(16);
+  const [start, setStart] = useState(53563327);
+  const [end, setEnd] = useState(53909185);
+  const [variant, setVariant] = useState("16:53563327:T:C"); // Adjust this if you want to use the variant prop
 
   const handleStartChange = (e) => setStart(Number(e.target.value));
   const handleEndChange = (e) => setEnd(Number(e.target.value));
@@ -34,7 +36,7 @@ const App = () => {
         <input type="text" value={variant} onChange={handleVariantChange} />
       </label>
 
-      <LZoom start={start} end={end} variant={variant} />
+      <LZoom start={start} end={end} variant={variant} chr={chr} />
     </div>
   );
 };

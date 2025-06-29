@@ -1,13 +1,12 @@
-import React, { useEffect, useRef } from "react";
-import 'locuszoom/dist/locuszoom.css';
-import './../../public/style.css'
+import { useEffect, useRef } from "react";
 import LocusZoom from 'locuszoom'
-// import credibleSets from 'locuszoom/esm/ext/lz-credible-sets';
 import LzDynamicUrls from 'locuszoom/esm/ext/lz-dynamic-urls';
 import credibleSets from '../utils/custom-cs-adapter'
 import ldAdapter from '../utils/custom-ld-adapter'
+import 'locuszoom/dist/locuszoom.css';
+import './../../public/style.css'
 
-const LZoom = ({ start = 53673256, end = 53831146, variant="16:53817318:G:A", chr = 16}) => {
+const LZoom = ({ start, end, variant, chr }) => {
 
   const plotRef = useRef(null);
   const inputRef = useRef(null);
@@ -69,12 +68,12 @@ const LZoom = ({ start = 53673256, end = 53831146, variant="16:53817318:G:A", ch
       let state = {
         id: namespace + '_cred',
         title:{test:"lmsdk"},
-        state: { chr: 16, start, end },
+        state: { chr, start, end },
         // credible_set_threshold: 100.95,
       }
       var initial_layout = {
         state: {
-          chr: 16,
+          chr,
           start,
           end,
           ld_pop: "EUR",
@@ -86,9 +85,9 @@ const LZoom = ({ start = 53673256, end = 53831146, variant="16:53817318:G:A", ch
         aspect_ratio: 2,
         dashboard: LocusZoom.Layouts.get("toolbar", "region_nav_plot"),
         panels: [
-          // LocusZoom.Layouts.get("plot", "annotationcredibleset", mods),
-          // LocusZoom.Layouts.get("panel", "association", mods),
+          LocusZoom.Layouts.get("panel", "association", mods),
           LocusZoom.Layouts.get("panel", "genes"),
+          // LocusZoom.Layouts.get("plot", "annotationcredibleset", mods),
           LocusZoom.Layouts.get("panel", "association_credible_set", {state:state}),
     ]
       };
