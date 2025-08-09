@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import LocusZoom from 'locuszoom';
-import 'locuszoom/dist/locuszoom.css';
-import jsonData from '../../Data/hg-data_2.json';
+import LocusZoom from "locuszoom";
+import "locuszoom/dist/locuszoom.css";
+import jsonData from "../../Data/hg-data_2.json";
 
 // Function to parse the JSON data
 const parseCredibleSets = (json) => {
@@ -11,15 +11,15 @@ const parseCredibleSets = (json) => {
     return { variants: [], regions: [] };
   }
 
-  const regions = Object.keys(json.data).map(key => {
-      const parts = key.split(':');
-      return { chr: parts[0], position: parseInt(parts[1]) };
+  const regions = Object.keys(json.data).map((key) => {
+    const parts = key.split(":");
+    return { chr: parts[0], position: parseInt(parts[1]) };
   });
 
   for (const key in json.data) {
     const credibleSets = json.data[key].credible_sets;
     if (credibleSets) {
-      credibleSets.forEach(set => {
+      credibleSets.forEach((set) => {
         const variantData = set.variants.data;
         const keys = Object.keys(variantData);
         if (keys.length === 0) return;
@@ -27,7 +27,7 @@ const parseCredibleSets = (json) => {
 
         for (let i = 0; i < numVariants; i++) {
           const variant = {};
-          keys.forEach(key => {
+          keys.forEach((key) => {
             variant[key] = variantData[key][i];
           });
           variants.push(variant);
@@ -38,7 +38,6 @@ const parseCredibleSets = (json) => {
   return { variants, regions };
 };
 
-
 const LZoomLocal = () => {
   const plotRef = useRef(null);
   const [plot, setPlot] = useState(null);
@@ -47,7 +46,7 @@ const LZoomLocal = () => {
 
   useEffect(() => {
     if (!plotRef.current) {
-        return;
+      return;
     }
     try {
       const { variants, regions } = parseCredibleSets(jsonData);
@@ -60,28 +59,44 @@ const LZoomLocal = () => {
       }
 
       const dataSources = new LocusZoom.DataSources()
-        .add('assoc', ['StaticJSON', { data: variants }])
-        .add("gene", ["GeneLZ", { url: "https://portaldev.sph.umich.edu/api/v1/annotation/genes/", build: 'GRCh38' }])
-        .add('constraint', ['GeneConstraintLZ', { url: 'https://gnomad.broadinstitute.org/api/', build: 'GRCh38' }])
-        .add('ld', ['LDServer', { url: 'https://portaldev.sph.umich.edu/ld/', source: '1000G', build: 'GRCh38', population: 'EUR' }]);
+        .add("assoc", ["StaticJSON", { data: variants }])
+        .add("gene", [
+          "GeneLZ",
+          {
+            url: "https://portaldev.sph.umich.edu/api/v1/annotation/genes/",
+            build: "GRCh38",
+          },
+        ])
+        .add("constraint", [
+          "GeneConstraintLZ",
+          { url: "https://gnomad.broadinstitute.org/api/", build: "GRCh38" },
+        ])
+        .add("ld", [
+          "LDServer",
+          {
+            url: "https://portaldev.sph.umich.edu/ld/",
+            source: "1000G",
+            build: "GRCh38",
+            population: "EUR",
+          },
+        ]);
 
-      const association_panel = LocusZoom.Layouts.get('panel', 'association', {
-          title: { text: 'Credible Set Variants' }
+      const association_panel = LocusZoom.Layouts.get("panel", "association", {
+        title: { text: "Credible Set Variants" },
       });
-      association_panel.data_layers = association_panel.data_layers.filter(function(layer) {
-          return layer.id !== 'recombrate';
-      });
+      association_panel.data_layers = association_panel.data_layers.filter(
+        function (layer) {
+          return layer.id !== "recombrate";
+        }
+      );
 
       const layout = {
-          width: 800,
-          height: 600,
-          responsive_resize: true,
-          min_region_scale: 20000,
-          max_region_scale: 1000000,
-          panels: [
-              association_panel,
-              LocusZoom.Layouts.get('panel', 'genes')
-          ]
+        width: 800,
+        height: 600,
+        responsive_resize: true,
+        min_region_scale: 20000,
+        max_region_scale: 1000000,
+        panels: [association_panel, LocusZoom.Layouts.get("panel", "genes")],
       };
 
       const newPlot = LocusZoom.populate(plotRef.current, dataSources, layout);
@@ -95,31 +110,35 @@ const LZoomLocal = () => {
       }
 
       newPlot.applyState({
-          chr: bestVariant.chromosome,
-          start: bestVariant.position - 50000,
-          end: bestVariant.position + 50000
+        chr: bestVariant.chromosome,
+        start: bestVariant.position - 50000,
+        end: bestVariant.position + 50000,
       });
-
     } catch (error) {
-      console.error("An error occurred during LocusZoom initialization:", error);
+      console.error(
+        "An error occurred during LocusZoom initialization:",
+        error
+      );
     }
   }, []);
 
   const handleRegionChange = (event) => {
     const regionStr = event.target.value;
     if (plot && regionStr) {
-        const [chr, position] = regionStr.split(':');
-        plot.applyState({
-            chr: chr,
-            start: parseInt(position) - 50000,
-            end: parseInt(position) + 50000
-        });
+      const [chr, position] = regionStr.split(":");
+      plot.applyState({
+        chr: chr,
+        start: parseInt(position) - 50000,
+        end: parseInt(position) + 50000,
+      });
     }
   };
 
   return (
     <div>
-      <h1 style={{ textAlign: 'center' }}>LocusZoom Visualization from Local JSON</h1>
+      <h1 style={{ textAlign: "center" }}>
+        LocusZoom Visualization from Local JSON
+      </h1>
       <div>
         <label htmlFor="region-selector">Select a Region: </label>
         <select id="region-selector" onChange={handleRegionChange}>
