@@ -3,7 +3,6 @@ import LocusZoom from "locuszoom";
 import "locuszoom/dist/locuszoom.css";
 import jsonData from "../../Data/hg-data_2.json";
 
-// Function to parse the JSON data
 const parseCredibleSets = (json) => {
   const variants = [];
   if (!json || !json.data) {
@@ -85,10 +84,23 @@ const LZoomLocal = () => {
         title: { text: "Credible Set Variants" },
       });
       association_panel.data_layers = association_panel.data_layers.filter(
-        function (layer) {
-          return layer.id !== "recombrate";
-        }
+        (layer) => layer.id !== "recombrate"
       );
+
+      association_panel.interaction = {
+        drag_background_to_pan: false,
+        scroll_to_zoom: false,
+        drag_x_ticks_to_pan: false,
+        drag_y_ticks_to_pan: false,
+      };
+
+      const genes_panel = LocusZoom.Layouts.get("panel", "genes");
+      genes_panel.interaction = {
+        drag_background_to_pan: false,
+        scroll_to_zoom: false,
+        drag_x_ticks_to_pan: false,
+        drag_y_ticks_to_pan: false,
+      };
 
       const layout = {
         width: 800,
@@ -96,7 +108,7 @@ const LZoomLocal = () => {
         responsive_resize: true,
         min_region_scale: 20000,
         max_region_scale: 1000000,
-        panels: [association_panel, LocusZoom.Layouts.get("panel", "genes")],
+        panels: [association_panel, genes_panel],
       };
 
       const newPlot = LocusZoom.populate(plotRef.current, dataSources, layout);
