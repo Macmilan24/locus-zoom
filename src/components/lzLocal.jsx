@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import LocusZoom from "locuszoom";
 import "locuszoom/dist/locuszoom.css";
-import jsonData from "../../Data/hg-data_2.json";
+import jsonData from "../../Data/hg-data_2_grch38.json";
 
 const parseCredibleSets = (json) => {
   const variants = [];
@@ -10,10 +10,8 @@ const parseCredibleSets = (json) => {
     return { variants: [], regions: [] };
   }
 
-  const regions = Object.keys(json.data).map((key) => {
-    const parts = key.split(":");
-    return { chr: parts[0], position: parseInt(parts[1]) };
-  });
+  const regions = [];
+  const uniqueRegions = new Set();
 
   for (const key in json.data) {
     const credibleSets = json.data[key].credible_sets;
@@ -32,6 +30,21 @@ const parseCredibleSets = (json) => {
           variants.push(variant);
         }
       });
+    }
+    // region_lead_variant from metadata. this is for performance
+    if (
+      json.data[key].metadata &&
+      json.data[key].metadata.region_lead_variant
+    ) {
+      const lead_variant_str = json.data[key].metadata.region_lead_variant;
+      const parts = lead_variant_str.split(":");
+      const chr = parts[0];
+      const position = parseInt(parts[1]);
+      const regionKey = `${chr}:${position}`;
+      if (!uniqueRegions.has(regionKey)) {
+        uniqueRegions.add(regionKey);
+        regions.push({ chr: chr, position: position });
+      }
     }
   }
   return { variants, regions };
@@ -136,12 +149,73 @@ const LZoomLocal = () => {
 
   const handleRegionChange = (event) => {
     const regionStr = event.target.value;
-    if (plot && regionStr) {
-      const [chr, position] = regionStr.split(":");
+    if (plot && regionStr && associationData.length > 0) {
+      const [selectedChr, selectedPosStr] = regionStr.split(":");
+      const selectedPos = parseInt(selectedPosStr);
+
+      let regionMetadata = null;
+      for (const key in jsonData.data) {
+        if (
+          jsonData.data[key].metadata &&
+          String(jsonData.data[key].metadata.chr) === selectedChr &&
+          jsonData.data[key].metadata.position === selectedPos
+        ) {
+          regionMetadata = jsonData.data[key].metadata;
+          break;
+        }
+      }
+
+      if (!regionMetadata) {
+        console.warn(`Metadata for selected region ${regionStr} not found.`);
+        return;
+      }
+
+      const window_kb = regionMetadata.window_kb || 2000;
+      const half_window_bp = (window_kb * 1000) / 2;
+      const regionStart = selectedPos - half_window_bp;
+      const regionEnd = selectedPos + half_window_bp;
+
+      const variantsInRegion = associationData.filter((variant) => {
+        return (
+          String(variant.chromosome) === selectedChr &&
+          variant.position >= regionStart &&
+          variant.position <= regionEnd
+        );
+      });
+
+      if (variantsInRegion.length === 0) {
+        console.warn(
+          `No variants found in the calculated region for ${regionStr}.`
+        );
+        plot.applyState({
+          chr: selectedChr,
+          start: selectedPos - 50000,
+          end: selectedPos + 50000,
+        });
+        return;
+      }
+
+      let minVariantPos = variantsInRegion[0].position;
+      let maxVariantPos = variantsInRegion[0].position;
+
+      for (let i = 1; i < variantsInRegion.length; i++) {
+        if (variantsInRegion[i].position < minVariantPos) {
+          minVariantPos = variantsInRegion[i].position;
+        }
+        if (variantsInRegion[i].position > maxVariantPos) {
+          maxVariantPos = variantsInRegion[i].position;
+        }
+      }
+
+      // a buffer for better visualization
+      const buffer = 10000;
+      const finalStart = Math.max(0, minVariantPos - buffer);
+      const finalEnd = maxVariantPos + buffer;
+
       plot.applyState({
-        chr: chr,
-        start: parseInt(position) - 50000,
-        end: parseInt(position) + 50000,
+        chr: selectedChr,
+        start: finalStart,
+        end: finalEnd,
       });
     }
   };
