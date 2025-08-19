@@ -3,6 +3,9 @@ import LocusZoom from "locuszoom";
 import "locuszoom/dist/locuszoom.css";
 import jsonData from "../../Data/hg-data_2_grch38.json";
 
+// Parse input JSON into two things:
+// 1) a flat list of variant objects for the association track
+// 2) a deduped list of regions (from metadata) to drive the dropdown
 const parseCredibleSets = (json) => {
   const variants = [];
   if (!json || !json.data) {
@@ -14,6 +17,7 @@ const parseCredibleSets = (json) => {
   const uniqueRegions = new Set();
 
   for (const key in json.data) {
+    // Credible sets may store variant data in "columnar" arrays; convert to row objects
     const credibleSets = json.data[key].credible_sets;
     if (credibleSets) {
       credibleSets.forEach((set) => {
@@ -31,7 +35,7 @@ const parseCredibleSets = (json) => {
         }
       });
     }
-    // region_lead_variant from metadata. this is for performance
+    // Use region_lead_variant from metadata to seed dropdown options (efficient, deduped)
     if (
       json.data[key].metadata &&
       json.data[key].metadata.region_lead_variant
@@ -57,10 +61,12 @@ const LZoomLocal = () => {
   const [associationData, setAssociationData] = useState([]);
 
   useEffect(() => {
+    // One-time plot initialization
     if (!plotRef.current) {
       return;
     }
     try {
+      // Prepare data for the association layer and the dropdown
       const { variants, regions } = parseCredibleSets(jsonData);
       setAssociationData(variants);
       setRegions(regions);
@@ -70,6 +76,7 @@ const LZoomLocal = () => {
         return;
       }
 
+      // Configure data sources: local association data + remote annotations/LD
       const dataSources = new LocusZoom.DataSources()
         .add("assoc", ["StaticJSON", { data: variants }])
         .add("gene", [
@@ -93,13 +100,16 @@ const LZoomLocal = () => {
           },
         ]);
 
+      // Start from the standard association + genes layout and tweak
       const association_panel = LocusZoom.Layouts.get("panel", "association", {
         title: { text: "Credible Set Variants" },
       });
+      // Remove recombination rate layer (not needed for this view)
       association_panel.data_layers = association_panel.data_layers.filter(
         (layer) => layer.id !== "recombrate"
       );
 
+      // Disable panning/zooming by user input; we control region via dropdown
       association_panel.interaction = {
         drag_background_to_pan: false,
         scroll_to_zoom: false,
@@ -115,6 +125,7 @@ const LZoomLocal = () => {
         drag_y_ticks_to_pan: false,
       };
 
+      // Overall plot layout and bounds
       const layout = {
         width: 800,
         height: 600,
@@ -124,9 +135,11 @@ const LZoomLocal = () => {
         panels: [association_panel, genes_panel],
       };
 
+      // Create the plot
       const newPlot = LocusZoom.populate(plotRef.current, dataSources, layout);
       setPlot(newPlot);
 
+      // Choose the most significant variant (highest log_pvalue) to set initial view
       let bestVariant = variants[0];
       for (let i = 1; i < variants.length; i++) {
         if (variants[i].log_pvalue > bestVariant.log_pvalue) {
@@ -134,6 +147,7 @@ const LZoomLocal = () => {
         }
       }
 
+      // Center initial region +/- 50kb around the best variant
       newPlot.applyState({
         chr: bestVariant.chromosome,
         start: bestVariant.position - 50000,
@@ -148,11 +162,13 @@ const LZoomLocal = () => {
   }, []);
 
   const handleRegionChange = (event) => {
+    // Update the view when a user chooses a new region from the dropdown
     const regionStr = event.target.value;
     if (plot && regionStr && associationData.length > 0) {
       const [selectedChr, selectedPosStr] = regionStr.split(":");
       const selectedPos = parseInt(selectedPosStr);
 
+      // Find metadata for this region (e.g., window size)
       let regionMetadata = null;
       for (const key in jsonData.data) {
         if (
@@ -170,11 +186,13 @@ const LZoomLocal = () => {
         return;
       }
 
+      // Compute the region bounds using metadata (fallback handled below)
       const window_kb = regionMetadata.window_kb || 2000;
       const half_window_bp = (window_kb * 1000) / 2;
       const regionStart = selectedPos - half_window_bp;
       const regionEnd = selectedPos + half_window_bp;
 
+      // Filter the local association data to variants in the chosen window
       const variantsInRegion = associationData.filter((variant) => {
         return (
           String(variant.chromosome) === selectedChr &&
@@ -187,6 +205,7 @@ const LZoomLocal = () => {
         console.warn(
           `No variants found in the calculated region for ${regionStr}.`
         );
+        // Fallback to a small +/- 50kb window centered on the position
         plot.applyState({
           chr: selectedChr,
           start: selectedPos - 50000,
@@ -195,6 +214,7 @@ const LZoomLocal = () => {
         return;
       }
 
+      // Compute tighter bounds based on observed variant positions
       let minVariantPos = variantsInRegion[0].position;
       let maxVariantPos = variantsInRegion[0].position;
 
@@ -207,7 +227,7 @@ const LZoomLocal = () => {
         }
       }
 
-      // a buffer for better visualization
+      // Add a small buffer for better visualization
       const buffer = 10000;
       const finalStart = Math.max(0, minVariantPos - buffer);
       const finalEnd = maxVariantPos + buffer;
@@ -226,6 +246,7 @@ const LZoomLocal = () => {
         LocusZoom Visualization from Local JSON
       </h1>
       <div>
+        {/* Region selector controls the genomic window shown in the plot */}
         <label htmlFor="region-selector">Select a Region: </label>
         <select id="region-selector" onChange={handleRegionChange}>
           {regions.map((region, index) => (
@@ -235,6 +256,7 @@ const LZoomLocal = () => {
           ))}
         </select>
       </div>
+      {/* LocusZoom will render the plot into this container */}
       <div id="lz-plot" ref={plotRef}></div>
     </div>
   );
